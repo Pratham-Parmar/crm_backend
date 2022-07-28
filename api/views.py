@@ -38,7 +38,7 @@ def add(request):
         destination=destination_port,
         container_size=req["container_size"],
         # line=req["line"],
-        created_by=user,
+        created_by=user.username,
         rate=req["rate"]
     )
     return JsonResponse({"status": "success"}, status=200)
