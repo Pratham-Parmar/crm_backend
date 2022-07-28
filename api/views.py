@@ -56,28 +56,20 @@ def add_port(request):
 @login_required
 def search(request):
     req = request.GET
+    source = req.get("source","")
+    destination = req.get("destination","")
+    container_size = req.get("container_size","")
+
     query = Rates.objects.raw(
-        """
+        f"""
         SELECT * from api_rates 
+        WHERE source_id like '%{source}%'
+        AND destination_id like '%{destination}%'
+        AND container_size like '%{container_size}%'
         GROUP BY source_id,destination_id,container_size 
         HAVING MAX(created_at) ORDER BY created_at
         """
     )
-    source = req.get("source",None)
-    destination = req.get("destination",None)
-    container_size = req.get("container_size",None)
-
-    if source:
-        query = query.filter(source=source)
-
-    if destination:
-        query = query.filter(destination=destination)
-
-    # if req["line"] is not None:
-    #    query = query.filter(line=request["line"])
-
-    if container_size is not None:
-        query = query.filter(container_size=container_size)
 
     resp = [x["fields"] for x in serializers.serialize("python", query)]
     return JsonResponse(resp, safe=False, status=200)
