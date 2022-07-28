@@ -71,6 +71,9 @@ def search(request):
         """
     )
 
+    if source == "" and destination == "" and container_size == "":
+        query = Rates.objects.all()
+
     resp = [x["fields"] for x in serializers.serialize("python", query)]
     return JsonResponse(resp, safe=False, status=200)
 
