@@ -59,8 +59,10 @@ def search(request):
     source = req.get("source","")
     destination = req.get("destination","")
     container_size = req.get("container_size","")
+    user = User.objects.filter(email=req["email"]).first()
+    query = Rates.objects.filter(created_by=user)
 
-    query = Rates.objects.all()
+    # query = Rates.objects.all()
 
 
     # query = Rates.objects.raw(
