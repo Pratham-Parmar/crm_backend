@@ -27,7 +27,7 @@ def logout_user(request):
 
 
 @require_http_methods(["POST"])
-@login_required
+# @login_required
 def add(request):
     req = json.loads(request.body)
     source_port = Port.objects.filter(name=req["source"]).first()
