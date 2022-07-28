@@ -71,7 +71,7 @@ def search(request):
         """
     )
 
-    if source == "" and destination == "" and container_size == "":
+    if (source == "" and destination == "" and container_size == "") :
         query = Rates.objects.all()
 
     resp = [x["fields"] for x in serializers.serialize("python", query)]
