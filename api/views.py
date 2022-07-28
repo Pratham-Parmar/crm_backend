@@ -60,19 +60,20 @@ def search(request):
     destination = req.get("destination","")
     container_size = req.get("container_size","")
 
-    query = Rates.objects.raw(
-        f"""
-        SELECT * from api_rates 
-        WHERE source_id like '%{source}%'
-        AND destination_id like '%{destination}%'
-        AND container_size like '%{container_size}%'
-        GROUP BY source_id,destination_id,container_size 
-        HAVING MAX(created_at) ORDER BY created_at
-        """
-    )
+    query = Rates.objects.all()
 
-    if (source == "" and destination == "" and container_size == "") :
-        query = Rates.objects.all()
+
+    # query = Rates.objects.raw(
+    #     f"""
+    #     SELECT * from api_rates
+    #     WHERE source_id like '%{source}%'
+    #     AND destination_id like '%{destination}%'
+    #     AND container_size like '%{container_size}%'
+    #     GROUP BY source_id,destination_id,container_size
+    #     HAVING MAX(created_at) ORDER BY created_at
+    #     """
+    # )
+
 
     resp = [x["fields"] for x in serializers.serialize("python", query)]
     return JsonResponse(resp, safe=False, status=200)
