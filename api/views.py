@@ -53,7 +53,7 @@ def add_port(request):
 
 
 @require_http_methods(["GET"])
-@login_required
+# @login_required
 def search(request):
     req = request.GET
     source = req.get("source","")
