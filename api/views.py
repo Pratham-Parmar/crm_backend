@@ -37,7 +37,7 @@ def add(request):
         source=source_port,
         destination=destination_port,
         container_size=req["container_size"],
-        exim=req["exim"],
+        # exim=req["exim"],
         created_by=user,
         rate=req["rate"],
     )
@@ -56,7 +56,7 @@ def add_port(request):
 # @login_required
 def search(request):
     req = request.GET
-    exim = req.get("exim","")
+    # exim = req.get("exim","")
     source = req.get("source","")
     destination = req.get("destination","")
     container_size = req.get("container_size","")
