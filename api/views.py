@@ -56,7 +56,7 @@ def add_port(request):
 # @login_required
 def search(request):
     req = request.GET
-    exim = req("exim","")
+    exim = req.get("exim","")
     source = req.get("source","")
     destination = req.get("destination","")
     container_size = req.get("container_size","")
