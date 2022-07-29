@@ -37,7 +37,7 @@ def add(request):
         source=source_port,
         destination=destination_port,
         container_size=req["container_size"],
-        exim=req["exim"],
+        name=req["exim"],
         created_by=user,
         rate=req["rate"],
     )

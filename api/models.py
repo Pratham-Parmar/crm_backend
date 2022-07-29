@@ -23,7 +23,7 @@ class Rates(models.Model):
     source = models.ForeignKey(Port, on_delete=models.PROTECT, related_name='source')
     destination = models.ForeignKey(Port, on_delete=models.PROTECT, related_name='destination')
     container_size = models.CharField(max_length=5, choices=container_sizes)
-    exim = models.CharField(max_length=100, choices=exim)
+    name = models.CharField(max_length=100, choices=Exim)
     rate = models.FloatField()
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now=True)
