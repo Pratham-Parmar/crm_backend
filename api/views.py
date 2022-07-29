@@ -3,7 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
-from .models import User, Rates, Port
+from .models import User, Rates, Port, Exim
 from django.core import serializers
 # Create your views here.
 from django.http import JsonResponse
@@ -37,9 +37,9 @@ def add(request):
         source=source_port,
         destination=destination_port,
         container_size=req["container_size"],
-        # line=req["line"],
+        exim=req["exim"],
         created_by=user,
-        rate=req["rate"]
+        rate=req["rate"],
     )
     return JsonResponse({"status": "success"}, status=200)
 
