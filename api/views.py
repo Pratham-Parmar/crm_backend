@@ -3,7 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
-from .models import User, Rates, Port, Exim
+from .models import User, Rates, Port
 from django.core import serializers
 # Create your views here.
 from django.http import JsonResponse
@@ -37,7 +37,7 @@ def add(request):
         source=source_port,
         destination=destination_port,
         container_size=req["container_size"],
-        Exim=req["exim"],
+        exim=req["exim"],
         created_by=user,
         rate=req["rate"],
     )
@@ -56,6 +56,7 @@ def add_port(request):
 # @login_required
 def search(request):
     req = request.GET
+    exim = req("exim","")
     source = req.get("source","")
     destination = req.get("destination","")
     container_size = req.get("container_size","")
