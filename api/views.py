@@ -2,12 +2,14 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
 
 from .models import User, Rates, Port
 from django.core import serializers
 # Create your views here.
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
+from django.views.generic.edit import DeleteView
 
 
 @require_http_methods(["POST"])
@@ -33,14 +35,16 @@ def add(request):
     source_port = Port.objects.filter(name=req["source"]).first()
     destination_port = Port.objects.filter(name=req["destination"]).first()
     user = User.objects.filter(email=req["email"]).first()
-    Rates.objects.create(
+    print(source_port, destination_port, user,req["container_size"] )
+    rate = Rates.objects.create(
         source=source_port,
         destination=destination_port,
         container_size=req["container_size"],
-        # exim=req["exim"],
+        exim=req["exim"],
         created_by=user,
         rate=req["rate"],
     )
+    rate.save()
     return JsonResponse({"status": "success"}, status=200)
 
 
@@ -55,13 +59,15 @@ def add_port(request):
 @require_http_methods(["GET"])
 # @login_required
 def search(request):
-    req = request.GET
-    # exim = req.get("exim","")
-    source = req.get("source","")
-    destination = req.get("destination","")
-    container_size = req.get("container_size","")
-    user = User.objects.filter(email=req["email"]).first()
-    query = Rates.objects.filter(created_by=user)
+    rates = Rates.objects.all()
+
+    # req = request.GET
+    # # exim = req.get("exim","")
+    # source = req.get("source","")
+    # destination = req.get("destination","")
+    # container_size = req.get("container_size","")
+    # user = User.objects.filter(email=req["email"]).first()
+    # query = Rates.objects.filter(created_by=user)
 
     # query = Rates.objects.all()
 
@@ -77,9 +83,12 @@ def search(request):
     #     """
     # )
 
+    # resp = [x["fields"] for x in serializers.serialize("python", query)]
+    tmpJson = serializers.serialize("json", rates)
+    tmpObj = json.loads(tmpJson)
 
-    resp = [x["fields"] for x in serializers.serialize("python", query)]
-    return JsonResponse(resp, safe=False, status=200)
+    return HttpResponse(json.dumps(tmpObj))
+    # return JsonResponse(rates, safe=False, status=200)
 
 
 @require_http_methods(["GET"])
@@ -89,3 +98,7 @@ def ports(request):
     print()
     resp = [x["pk"] for x in serializers.serialize("python", query)]
     return JsonResponse(resp, safe=False, status=200)
+
+
+# class RowDeleteView(DeleteView):
+
