@@ -29,19 +29,17 @@ def logout_user(request):
 
 
 @require_http_methods(["POST"])
-# @login_required
+@login_required
 def add(request):
     req = json.loads(request.body)
     source_port = Port.objects.filter(name=req["source"]).first()
     destination_port = Port.objects.filter(name=req["destination"]).first()
-    user = User.objects.filter(email=req["email"]).first()
-    print(source_port, destination_port, user,req["container_size"] )
+    print(source_port, destination_port, user, req["container_size"])
     rate = Rates.objects.create(
         source=source_port,
         destination=destination_port,
         container_size=req["container_size"],
         exim=req["exim"],
-        created_by=user,
         rate=req["rate"],
     )
     rate.save()
@@ -57,38 +55,28 @@ def add_port(request):
 
 
 @require_http_methods(["GET"])
-# @login_required
+@login_required
 def search(request):
-    rates = Rates.objects.all()
+    req = request.GET
+    exim = req.get("exim", "")
+    source = req.get("source", "")
+    destination = req.get("destination", "")
+    container_size = req.get("container_size", "")
 
-    # req = request.GET
-    # # exim = req.get("exim","")
-    # source = req.get("source","")
-    # destination = req.get("destination","")
-    # container_size = req.get("container_size","")
-    # user = User.objects.filter(email=req["email"]).first()
-    # query = Rates.objects.filter(created_by=user)
+    query = Rates.objects.raw(
+        f"""
+        SELECT * from api_rates
+        WHERE source_id like '%{source}%'
+        AND destination_id like '%{destination}%'
+        AND container_size like '%{container_size}%'
+        AND exim like  '%{exim}'
+        GROUP BY source_id,destination_id,container_size
+        HAVING MAX(created_at) ORDER BY created_at
+        """
+    )
 
-    # query = Rates.objects.all()
-
-
-    # query = Rates.objects.raw(
-    #     f"""
-    #     SELECT * from api_rates
-    #     WHERE source_id like '%{source}%'
-    #     AND destination_id like '%{destination}%'
-    #     AND container_size like '%{container_size}%'
-    #     GROUP BY source_id,destination_id,container_size
-    #     HAVING MAX(created_at) ORDER BY created_at
-    #     """
-    # )
-
-    # resp = [x["fields"] for x in serializers.serialize("python", query)]
-    tmpJson = serializers.serialize("json", rates)
-    tmpObj = json.loads(tmpJson)
-
-    return HttpResponse(json.dumps(tmpObj))
-    # return JsonResponse(rates, safe=False, status=200)
+    resp = [x["fields"] for x in serializers.serialize("python", query)]
+    return JsonResponse(resp, safe=False, status=200)
 
 
 @require_http_methods(["GET"])
@@ -100,5 +88,8 @@ def ports(request):
     return JsonResponse(resp, safe=False, status=200)
 
 
-# class RowDeleteView(DeleteView):
-
+@require_http_methods(["POST"])
+@login_required
+def delete_rate(request):
+    Rates.objects.filter(id=request["id"]).first().delete()
+    return JsonResponse({"status": "success"}, safe=False, status=200)
