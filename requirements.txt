@@ -3,3 +3,4 @@ Django==4.0.6
 sqlparse==0.4.2
 gunicorn
 django-cors-headers
+whitenoise
