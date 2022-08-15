@@ -34,7 +34,6 @@ def add(request):
     req = json.loads(request.body)
     source_port = Port.objects.filter(name=req["source"]).first()
     destination_port = Port.objects.filter(name=req["destination"]).first()
-    print(source_port, destination_port, user, req["container_size"])
     rate = Rates.objects.create(
         source=source_port,
         destination=destination_port,
@@ -74,8 +73,9 @@ def search(request):
         HAVING MAX(created_at) ORDER BY created_at
         """
     )
+    data = serializers.serialize("python", query)
 
-    resp = [x["fields"] for x in serializers.serialize("python", query)]
+    resp = [{**x["fields"], "id": x["pk"]} for x in data]
     return JsonResponse(resp, safe=False, status=200)
 
 
@@ -91,5 +91,6 @@ def ports(request):
 @require_http_methods(["POST"])
 @login_required
 def delete_rate(request):
-    Rates.objects.filter(id=request["id"]).first().delete()
+    id = json.loads(request.body)["id"]
+    Rates.objects.filter(id=id).first().delete()
     return JsonResponse({"status": "success"}, safe=False, status=200)
